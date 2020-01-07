@@ -3,6 +3,7 @@ function onOpen() {
   Logger.log(Session.getActiveUser());
   ui.createMenu('SORACOM')
   .addItem('listSubscribrs', 'listSubscribers')
+  .addItem('listSigfoxDevices', 'listSigfoxDevices')
   .addToUi();
 }
 
@@ -38,6 +39,53 @@ function getEndpointUrl(coverageType){
     }
   }
   return "https://api.soracom.io";
+}
+
+function fetchPagedData(authInfo, baseUrl, path, limit){
+  var count=0;
+  var last_evaluated_key=undefined;
+  var output=[];
+  while(true)
+  {
+    count++;    
+    const params={
+      method: 'GET',
+      contentType: "application/json",
+      headers: {
+        "Accept":"application/json",
+        "X-Soracom-API-Key": authInfo.apiKey,
+        "X-Soracom-Token": authInfo.token
+      }
+    };
+  
+    var url = baseUrl+path+"?limit="+limit;
+    if(last_evaluated_key)
+    {
+      url+="&last_evaluated_key="+last_evaluated_key;
+    }
+    var response = UrlFetchApp.fetch(url,params);
+    var data = JSON.parse(response.getContentText());
+    output = output.concat(data);
+    
+    Logger.log("fetched "+data.length+" data.");
+    
+    header=response.getHeaders();
+    Logger.log(header);
+    if(header.Link)
+    {
+      if(header.Link.match(/rel=prev/) && !header.Link.match(/rel=next/))
+      {
+        break;
+      }
+      header.Link.match(/last_evaluated_key=(\w+).; rel=next/);
+      last_evaluated_key=RegExp.$1;
+    }
+    else
+    {
+      break;
+    }
+  }
+  return output;
 }
 
 function renderResult(sheet, data) {

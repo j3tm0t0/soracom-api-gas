@@ -1,7 +1,7 @@
-function listSubscribers() {
+function listSigfoxDevices() {
   var limit=100;
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName("subscribers");
+  var sheet = ss.getSheetByName("sigfoxDevices");
   sheet.clear();
   sheet.getRange(1,1).setValue("認証中");
 
@@ -12,11 +12,11 @@ function listSubscribers() {
     return;
   }
   
-  subscribers = fetchPagedData(authInfo, baseUrl, "/v1/subscribers", limit);
+  sigfox_devices = fetchPagedData(authInfo, baseUrl, "/v1/sigfox_devices", limit);
 
-  for(var i=0; i<subscribers.length;i++)
+  for(var i=0; i<sigfox_devices.length;i++)
   {
-    s=subscribers[i];
+    s=sigfox_devices[i];
     if(s.tags)
     {
       s['name'] = s.tags.name;
@@ -27,5 +27,5 @@ function listSubscribers() {
       }
     }
   }
-  renderResult(sheet, subscribers);
+  renderResult(sheet, sigfox_devices);
 }
