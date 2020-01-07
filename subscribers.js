@@ -45,11 +45,11 @@ function listSubscribers() {
     Logger.log(header);
     if(header.Link)
     {
-      if(header.Link.match(/rel=prev/))
+      if(header.Link.match(/rel=prev/) && !header.Link.match(/rel=next/))
       {
         break;
       }
-      header.Link.match(/last_evaluated_key=(\w+)/);
+      header.Link.match(/last_evaluated_key=(\w+).; rel=next/);
       last_evaluated_key=RegExp.$1;
     }
     else
